@@ -1,67 +1,119 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>おみくじアプリ</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            background: #f5f5f5;
-            margin-top: 100px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反射神経ゲーム</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 40px 20px;
+    }
 
-        h1 {
-            color: #d32f2f;
-        }
+    h1 {
+      margin-bottom: 10px;
+    }
 
-        button {
-            font-size: 20px;
-            padding: 10px 30px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            background: #ff9800;
-            color: white;
-        }
+    #message {
+      font-size: 20px;
+      margin: 20px 0;
+    }
 
-        button:hover {
-            background: #f57c00;
-        }
+    #gameArea {
+      width: 320px;
+      height: 320px;
+      margin: 0 auto 20px;
+      background: white;
+      border: 2px solid #333;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+    }
 
-        #result {
-            margin-top: 40px;
-            font-size: 40px;
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+    #target {
+      width: 60px;
+      height: 60px;
+      background: tomato;
+      border-radius: 50%;
+      position: absolute;
+      display: none;
+      cursor: pointer;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #333;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+  </style>
 </head>
 <body>
 
-<h1>🎋 おみくじ 🎋</h1>
+  <h1>反射神経ゲーム</h1>
+  <p>赤い丸が出たら、できるだけ早くクリック！</p>
 
-<button onclick="drawFortune()">
-    おみくじを引く
-</button>
+  <div id="message">「スタート」を押してください。</div>
 
-<div id="result">？？？</div>
+  <div id="gameArea">
+    <div id="target"></div>
+  </div>
 
-<script>
-    function drawFortune() {
-        const fortunes = [
-            "🎉 大吉",
-            "😊 中吉",
-            "🙂 小吉",
-            "😌 吉",
-            "😐 末吉",
-            "😅 凶",
-            "💀 大凶"
-        ];
+  <button id="startButton">スタート</button>
 
-        const index = Math.floor(Math.random() * fortunes.length);
+  <script>
+    const target = document.getElementById("target");
+    const gameArea = document.getElementById("gameArea");
+    const message = document.getElementById("message");
+    const startButton = document.getElementById("startButton");
 
-        document.getElementById("result").textContent = fortunes[index];
+    let startTime = 0;
+    let timerId = null;
+
+    startButton.addEventListener("click", startGame);
+
+    function startGame() {
+      target.style.display = "none";
+      message.textContent = "準備してください...";
+      startButton.disabled = true;
+
+      const delay = 1000 + Math.random() * 3000;
+
+      timerId = setTimeout(() => {
+        const maxX = gameArea.clientWidth - 60;
+        const maxY = gameArea.clientHeight - 60;
+
+        const x = Math.random() * maxX;
+        const y = Math.random() * maxY;
+
+        target.style.left = x + "px";
+        target.style.top = y + "px";
+        target.style.display = "block";
+
+        message.textContent = "今だ！クリック！";
+        startTime = performance.now();
+      }, delay);
     }
-</script>
+
+    target.addEventListener("click", () => {
+      const reactionTime = Math.round(performance.now() - startTime);
+
+      target.style.display = "none";
+      message.textContent = "反応速度：" + reactionTime + " ミリ秒";
+      startButton.disabled = false;
+      startButton.textContent = "もう一度";
+    });
+  </script>
+
+</body>
+</html>
